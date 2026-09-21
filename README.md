@@ -3,7 +3,7 @@
 An adaptive, machine-learning-powered strength training engine built in TypeScript. 
 Instead of relying on static, rigid workout plans, **Gym Engine** dynamically calculates the optimal next exercise to maximize hypertrophy based on real-time individual recovery, performance trends, and biomechanical data.
 
-## 🧠 Core Concept
+## Core Concept
 
 The engine operates on a hybrid decision model evaluating a normalized 6-dimensional feature vector for every available exercise before a set:
 
@@ -18,7 +18,7 @@ The goal of the engine is to predict and select the exercise that yields the hig
 
 
 
-## 🗄️ Architecture & Data Flow
+## Architecture & Data Flow
 
 The system strictly separates static biomechanical facts from dynamic training history.
 
@@ -35,7 +35,7 @@ The relational database tracks sessions, sets, and ML training logs:
 - `records`: The individual sets (`weight`, `reps`, `rir`, `is_warmup`).
 - `nn_training_logs`: Stores the exact 6D feature vector $X$ and the achieved $e1RM$ delta $Y$ as training data for the neural network.
 
-## The AI Strategy: From Heuristics to Deep Learning
+
 
 Because Neural Networks require large datasets to overcome noise, the engine utilizes a two-phase bootstrapping approach:
 
@@ -48,7 +48,7 @@ Once enough data (or generated teacher-student pre-training data) is collected, 
 - **Output:** Predicted $e1RM$ Delta
 The engine runs a batched prediction across all available gym machines and recommends the one with the highest predicted performance gain.
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 - Node.js (v18+)
