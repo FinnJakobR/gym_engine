@@ -34,7 +34,6 @@ CREATE TABLE IF NOT EXISTS records (
     weight REAL NOT NULL,                   -- REAL für 2.5kg Schritte
     reps INTEGER NOT NULL,
     rir INTEGER,                            -- Reps in Reserve (optional)
-    is_warmup INTEGER DEFAULT 0,            -- Boolean (0 = Arbeitssatz, 1 = Aufwärmsatz)
     date DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (ex_id) REFERENCES ex(id) ON DELETE CASCADE
 );

@@ -188,7 +188,6 @@ export default class Database {
     reps: number,
     rir: number,
     set: number,
-    is_warmup: boolean,
   ) {
     const query = this.prepareQuery(INSERT_RECORD);
     query.run(
@@ -198,7 +197,6 @@ export default class Database {
       weight,
       reps,
       rir,
-      is_warmup ? 1 : 0,
     );
   }
 

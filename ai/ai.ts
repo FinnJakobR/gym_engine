@@ -1,4 +1,4 @@
-import * as tf from "@tensorflow/tfjs-node";
+import * as tf from "@tensorflow/tfjs";
 import Database from "../db/db";
 
 export class AiService {

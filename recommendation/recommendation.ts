@@ -2,7 +2,7 @@ import Database from "../db/db";
 import { Maschine } from "../weights/interfaces/maschine";
 import generateFeatureVector from "./features";
 import linearScore from "./score/linearScore";
-import * as tf from "@tensorflow/tfjs-node";
+import * as tf from "@tensorflow/tfjs";
 
 export interface Recommendation {
   maschine: Maschine;

@@ -63,18 +63,20 @@ export default class Workouts {
     // 2. EXERCISED INSTANCE & SATZ SPEICHERN (Exakt für die aktuelle Maschine!)
     const ex_id = this.conn.insertExercises(currentMaschine.id, p.workout_id);
 
-    logCompletedSet(
-      this.conn,
-      currentMaschine.id,
-      currentRecommendation.features,
-      currentRecommendation.score,
-      weight,
-      reps,
-      rir,
-      completedSet === 1, // is_warmup / first_set Check
-      completedSet, // <- Hier übergibst du sauber 1, 2 oder 3!
-      ex_id,
-    );
+    //Wir speichern keine Aufwärmsätze da diese nur potenzielle Bugs bringen
+    if (p.set > 1) {
+      logCompletedSet(
+        this.conn,
+        currentMaschine.id,
+        currentRecommendation.features,
+        currentRecommendation.score,
+        weight,
+        reps,
+        rir,
+        completedSet, // <- Hier übergibst du sauber 1, 2 oder 3!
+        ex_id,
+      );
+    }
 
     // 3. JETZT DEN STATE FÜR DEN NÄCHSTEN SATZ/MASCHINE HOCHZÄHLEN
     p.state = PlayerState.PAUSE;

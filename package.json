@@ -15,6 +15,6 @@
     "@types/node": "^26.5.1"
   },
   "dependencies": {
-    "@tensorflow/tfjs-node": "^4.22.0"
+    "@tensorflow/tfjs": "^4.22.0"
   }
 }

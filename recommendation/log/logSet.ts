@@ -9,7 +9,6 @@ export function logCompletedSet(
   weight: number,
   reps: number,
   rir: number,
-  is_warmup: boolean,
   set: number,
   ex_id: number,
 ) {
@@ -25,7 +24,7 @@ export function logCompletedSet(
     prevMaxE1RM > 0 ? (currentE1RM - prevMaxE1RM) / prevMaxE1RM : 0.0;
 
   // Echten Satz in 'records' eintragen
-  conn.insertRecord(machineId, ex_id, weight, reps, rir, set, is_warmup);
+  conn.insertRecord(machineId, ex_id, weight, reps, rir, set);
 
   // Trainingsdaten-Satz für das spätere NN in 'nn_training_logs' speichern
 
