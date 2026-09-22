@@ -22,7 +22,7 @@ The goal of the engine is to predict and select the exercise that yields the hig
 
 The system strictly separates static biomechanical facts from dynamic training history.
 
-### 1. Static Biomechanics (JSON)
+### 1. Static Biomechanics (exerciseDefinition.ts)
 Exercises are defined with immutable biomechanical facts:
 - `MuscleGroup` (Primary, Synergists, Antagonists)
 - `MuscleFocus` (Stretched vs. Contracted)
@@ -57,8 +57,11 @@ The engine runs a batched prediction across all available gym machines and recom
 ### Installation
 ```bash
 # Clone the repository
-git clone [https://github.com/yourusername/gym_engine.git](https://github.com/yourusername/gym_engine.git)
+git clone
 cd gym_engine
 
 # Install dependencies (including tfjs-node & sqlite3)
 npm install
+
+# To test the Engine you can use the CLI Example with:
+npm run test:cli

@@ -2,7 +2,7 @@
 CREATE TABLE IF NOT EXISTS maschines (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,                     -- z.B. "Gym-A Hammer Strength Presse"
-    exercise_def_id TEXT NOT NULL,          -- Verweis auf "chest_press_machine" aus dem JSON
+    exercise_def_id TEXT NOT NULL UNIQUE,          -- Verweis auf "chest_press_machine" aus exerciseDefinition.ts
     increment_step REAL DEFAULT 2.5,        -- Gerätespezifisches Steigerungsintervall
     max_reps INTEGER DEFAULT 10             -- Gerätespezifischer Ziel-Rep-Threshold
 );

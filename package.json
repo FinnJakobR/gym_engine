@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "tsc && node --experimental-sqlite build/gym.js"
+    "test:cli": "tsc && node --experimental-sqlite build/examples/cli_example.js",
+    "start": "echo \"Error: no main Script specified\" && exit 1"
   },
   "keywords": [],
   "author": "",

@@ -1,16 +1,15 @@
 import * as readline from "readline/promises";
 import { stdin as input, stdout as output } from "process";
-
-import Database from "./db/db";
-import { Player, PlayerState } from "./workout/types/player";
-import Workouts from "./workout/workout";
+import Database from "../db/db";
+import Workouts from "../workout/workout";
+import { Player, PlayerState } from "../workout/types/player";
 
 const MOCK_ID = 420;
 
 const main = async () => {
   const conn = new Database();
 
-  //conn.insertMockMaschines("./db/schemes/testMaschines.sql");
+  conn.insertMockMaschines("./db/schemes/testMaschines.sql");
 
   const workouts = new Workouts(conn);
 
