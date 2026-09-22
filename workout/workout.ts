@@ -1,3 +1,4 @@
+import { AiService } from "../ai/ai";
 import Database from "../db/db";
 import { logCompletedSet } from "../recommendation/log/logSet";
 import { getRecommendedMachines } from "../recommendation/recommendation";
@@ -10,6 +11,7 @@ import UNREACHABLE from "./util/unreachable";
 export default class Workouts {
   players: Player[] = [];
   conn: Database;
+  retrain: boolean = false;
 
   constructor(conn: Database) {
     this.conn = conn;
@@ -91,6 +93,14 @@ export default class Workouts {
     if (p.maschine_index >= p.rounds) {
       this.endWorkout(p);
       this.deleteUserById(p.user_id);
+
+      if (this.retrain) {
+        console.log("Retrain Neuronal Network");
+        const ai = new AiService();
+        ai.trainModel(this.conn);
+        this.retrain = false;
+      }
+
       return { ok: 1, start_time: new Date(), ended: true };
     }
 
@@ -130,6 +140,10 @@ export default class Workouts {
       p.set === 1,
     );
 
+    if (!this.retrain) {
+      this.retrain = this.checkForRetraining();
+    }
+
     return {
       ok: 1,
       start_time: new Date(),
@@ -137,6 +151,12 @@ export default class Workouts {
       weight: data.weight,
       reps: data.reps,
     };
+  }
+
+  /*Retraine das NN immer nach 20 Logs */
+  private checkForRetraining() {
+    const nn_training_logs = this.conn.getNNTrainingsdata();
+    return nn_training_logs.trainX.length % 20 == 0;
   }
 
   private getPlatoeWeeks(m: Maschine): number {
