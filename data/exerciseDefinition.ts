@@ -162,9 +162,9 @@ export const EXERCISE_DEFINITIONS: Record<string, ExerciseDefinition> = {
   close_grip_row: {
     id: "close_grip_row",
     name: "Enges Rudern (Kabel / Maschine)",
-    primaryMuscle: MuscleGroup.UPPER_BACK,
+    primaryMuscle: MuscleGroup.LATS,
     synergists: [
-      MuscleGroup.LATS,
+      MuscleGroup.UPPER_BACK,
       MuscleGroup.BICEPS,
       MuscleGroup.DELTS_POSTERIOR,
     ],
