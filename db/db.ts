@@ -9,9 +9,11 @@ import {
   GET_ALL_TRAININGS_DATE,
   GET_N_LAST_RECORDS,
   GET_PREVIOUS_1ERM,
+  GET_WEIGHTS,
   INSERT_EXERCISES,
   INSERT_NN_TRAINING_SET,
   INSERT_RECORD,
+  INSERT_WEIGHTS,
   INSERT_WORKOUT,
 } from "./queries";
 import { Maschine } from "../weights/interfaces/maschine";
@@ -242,5 +244,21 @@ export default class Database {
     );
 
     return;
+  }
+
+  public insertWeights(weights: string) {
+    const query = this.prepareQuery(INSERT_WEIGHTS);
+    query.run(weights);
+    return;
+  }
+
+  public getWeights() {
+    const query = this.prepareQuery(GET_WEIGHTS);
+
+    const raw = query.get();
+
+    if (!raw) return "";
+
+    return String(raw["weights"]);
   }
 }

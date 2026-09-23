@@ -23,4 +23,6 @@ export const INSERT_EXERCISES = `INSERT INTO ex (maschine_id, workout_id) VALUES
 export const INSERT_WORKOUT = `INSERT INTO workouts (start, end) VALUES(?,?)`;
 export const END_WORKOUT_QUERY = `UPDATE workouts SET end = ? WHERE id = ? `;
 export const GET_ALL_RECORDS_MASCHINE = `SELECT * FROM records WHERE maschine_id = ? ORDER BY date DESC`;
-export const GET_ALL_TRAININGS_DATE = `SELECT * FROM nn_training_logs WHERE e1rm_delta IS NOT NULL"`;
+export const GET_ALL_TRAININGS_DATE = `SELECT * FROM nn_training_logs WHERE e1rm_delta IS NOT NULL`;
+export const INSERT_WEIGHTS = `INSERT INTO weights (weights) VALUES (?)`;
+export const GET_WEIGHTS = `SELECT * FROM weights ORDER BY date DESC LIMIT 1`;

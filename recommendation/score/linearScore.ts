@@ -4,7 +4,7 @@ const WEIGHTS = {
   primaryMuscle: 3.5, // Zielmuskel MUSS erholt sein
   synergist: 1.5, // Hilfsmuskel sollte erholt sein
   staleness: -2.0, // Strafe für Abnutzung/Oft genutzt
-  performance: 1.0, // Positiver Trend gibt Bonus ("Ride the wave")
+  performance: 1.0, // Positiver Trend gibt Bonusich will ei
   machineRecovery: 1.0, // Bonus, wenn Maschine lange nicht genutzt wurde
   antagonist: 0.5, // Leichter Bonus für gegengleiche Frische
 };

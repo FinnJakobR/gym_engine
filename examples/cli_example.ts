@@ -3,6 +3,7 @@ import { stdin as input, stdout as output } from "process";
 import Database from "../db/db";
 import Workouts from "../workout/workout";
 import { Player, PlayerState } from "../workout/types/player";
+import { AiService } from "../ai/ai";
 
 const MOCK_ID = 420;
 
@@ -11,12 +12,15 @@ const main = async () => {
 
   conn.insertMockMaschines("./db/schemes/testMaschines.sql");
 
-  const workouts = new Workouts(conn);
+  const ai = new AiService();
 
-  // Interface für Konsolen-Eingaben initialisieren
+  await ai.tryLoadModel(conn);
+
+  const workouts = new Workouts(conn, ai);
+
   const rl = readline.createInterface({ input, output });
 
-  if (!workouts.start(MOCK_ID, 6)) {
+  if (!workouts.start(MOCK_ID, 1)) {
     console.log("❌ Fehler: Workout konnte nicht gestartet werden.");
     rl.close();
     return;

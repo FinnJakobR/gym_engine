@@ -52,7 +52,7 @@ export function getBatchedRecommendations(
   );
 
   // 2. EINEN großen Tensor bauen (Form: [AnzahlMaschinen, 6 Features])
-  const batchInput = tf.tensor2d(allFeatures);
+  const batchInput = tf.tensor2d(allFeatures, [allMaschines.length, 6]);
 
   // 3. EINE einzige Prediction für alle Maschinen gleichzeitig machen
   const predictions = aiModel.predict(batchInput) as tf.Tensor;

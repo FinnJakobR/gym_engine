@@ -20,8 +20,10 @@ export function logCompletedSet(
   const currentE1RM = E1RM(weight, reps);
 
   // Delta berechnen (z.B. +0.03 = 3% Steigerung, -0.02 = 2% Leistungseinbruch)
-  const e1rmDelta =
+  const rawDelta =
     prevMaxE1RM > 0 ? (currentE1RM - prevMaxE1RM) / prevMaxE1RM : 0.0;
+
+  const e1rmDelta = Math.max(-0.2, Math.min(0.2, rawDelta));
 
   // Echten Satz in 'records' eintragen
   conn.insertRecord(machineId, ex_id, weight, reps, rir, set);
