@@ -173,4 +173,26 @@ export const EXERCISE_DEFINITIONS: Record<string, ExerciseDefinition> = {
     focus: MuscleFocus.CONTRACTED,
     fatigue: Fatigue.HIGH,
   },
+
+  calf_press_leg_press: {
+    id: "calf_press_leg_press",
+    name: "Wadenheben an der Beinpresse",
+    primaryMuscle: MuscleGroup.CALVES,
+    synergists: [],
+    antagonist: MuscleGroup.QUADRICEPS,
+    movementPattern: "LEGS",
+    focus: MuscleFocus.STRECHTED,
+    fatigue: Fatigue.SMALL,
+  },
+
+  db_skullcrusher: {
+    id: "db_skullcrusher",
+    name: "Trizepsdrücken liegend (Kurzhanteln)",
+    primaryMuscle: MuscleGroup.TRICEPS_LATERAL_MEDIAL,
+    synergists: [],
+    antagonist: MuscleGroup.BICEPS,
+    movementPattern: "ISOLATION",
+    focus: MuscleFocus.STRECHTED,
+    fatigue: Fatigue.SMALL,
+  },
 };
