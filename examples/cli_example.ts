@@ -20,7 +20,7 @@ const main = async () => {
 
   const rl = readline.createInterface({ input, output });
 
-  if (!workouts.start(MOCK_ID, 1)) {
+  if (!workouts.start(MOCK_ID, 5)) {
     console.log("❌ Fehler: Workout konnte nicht gestartet werden.");
     rl.close();
     return;
@@ -28,9 +28,9 @@ const main = async () => {
 
   console.log("\n🏋️  === WORKOUT SIMULATOR GESTARTET === 🏋️\n");
 
-  let weight = 0;
-  let rir = 0;
-  let reps = 0;
+  // Speichert die aktuell von der Engine empfohlenen Werte (-1 = keine Historie)
+  let suggestedWeight = -1;
+  let suggestedReps = -1;
 
   while (true) {
     // 1. Aktuellen Player-State holen
@@ -58,17 +58,48 @@ const main = async () => {
     if (p.is_new_maschine) {
       console.log(`🆕 [DEBUG] Neue Maschine gewechselt!`);
     }
+
+    // Empfehlungs-Logik auswerten & anzeigen
+    if (suggestedWeight === -1 && suggestedReps === -1) {
+      console.log(
+        "ℹ️ [INFO] Maschine wurde noch nie benutzt (keine Daten vorhanden).",
+      );
+    } else if (suggestedWeight > -1 && suggestedReps > -1) {
+      console.log(
+        `💡 [EMPFEHLUNG] Vorgabe: ${suggestedWeight} kg x ${suggestedReps} Reps (Enter drückt Standardwert)`,
+      );
+    }
     console.log("--------------------------------------------------");
 
     // Interaktive Abfrage über die Konsole
-    const weightInput = await rl.question("  👉 Gewicht (kg): ");
-    const repsInput = await rl.question("  👉 Wiederholungen (Reps): ");
+    const weightInput = await rl.question(
+      suggestedWeight > -1
+        ? `  👉 Gewicht (kg) [Standard: ${suggestedWeight}]: `
+        : "  👉 Gewicht (kg): ",
+    );
+    const repsInput = await rl.question(
+      suggestedReps > -1
+        ? `  👉 Wiederholungen (Reps) [Standard: ${suggestedReps}]: `
+        : "  👉 Wiederholungen (Reps): ",
+    );
     const rirInput = await rl.question("  👉 Reps in Reserve (RIR): ");
 
-    // Inputs parsen und in Variablen schreiben
-    weight = parseFloat(weightInput) || 0;
-    reps = parseInt(repsInput, 10) || 0;
-    rir = parseInt(rirInput, 10) || 0;
+    // Inputs parsen: Verwende Eingabe ODER Fallback auf die Empfehlung (falls vorhanden)
+    const weight =
+      weightInput.trim() !== ""
+        ? parseFloat(weightInput) || 0
+        : suggestedWeight > -1
+          ? suggestedWeight
+          : 0;
+
+    const reps =
+      repsInput.trim() !== ""
+        ? parseInt(repsInput, 10) || 0
+        : suggestedReps > -1
+          ? suggestedReps
+          : 0;
+
+    const rir = parseInt(rirInput, 10) || 0;
 
     console.log(
       `\n💾 Sende Satz an Engine: [${weight}kg x ${reps} Reps | RIR: ${rir}]`,
@@ -84,8 +115,13 @@ const main = async () => {
       break;
     }
 
-    console.log("Weights: " + result.weight + " Reps: " + result.reps);
+    // Empfohlene Werte aus result für die NÄCHSTE Runde speichern
+    suggestedWeight = result.weight!;
+    suggestedReps = result.reps!;
 
+    console.log(
+      `\n➡️ Nächster Zielwert aus Engine -> Weight: ${result.weight} | Reps: ${result.reps}`,
+    );
     console.log("\n"); // Leerzeile für Übersichtlichkeit
   }
 

@@ -5,8 +5,9 @@ import {
   getBatchedRecommendations,
   getRecommendedMachines,
 } from "../recommendation/recommendation";
-import { RETRAIN_CYCLE } from "../settings/settings";
+import { RETRAIN_CYCLE, WARMUP_PROCENT } from "../settings/settings";
 import { Maschine } from "../weights/interfaces/maschine";
+import floorWeight from "../weights/utilities/floorWeight";
 import nextWeight from "../weights/weights";
 import { Player, PlayerState } from "./types/player";
 import { getPauseTime } from "./util/pause";
@@ -85,9 +86,7 @@ export default class Workouts {
       );
     }
 
-    // 3. JETZT DEN STATE FÜR DEN NÄCHSTEN SATZ/MASCHINE HOCHZÄHLEN
-    p.state = PlayerState.PAUSE;
-    p.lastPause = new Date();
+    this.setPause(p);
     p.set++;
 
     // Wenn 3 Sätze auf dieser Maschine durch sind -> Weiter zur nächsten
@@ -112,20 +111,10 @@ export default class Workouts {
       return { ok: 1, start_time: new Date(), ended: true };
     }
 
-    // EMPFEHLUNG FÜR DEN NÄCHSTEN SATZ BERECHNEN
-    // (Falls Maschine gewechselt wurde, holen wir die neue Empfehlung)
     const nextRecommendation = p.maschines[p.maschine_index];
     const nextMaschine = nextRecommendation.maschine;
 
     const lastSet = this.conn.getLastRecords(nextMaschine.id, 1)[0];
-    const lastThreeSets = this.conn.getLastRecords(nextMaschine.id, 3);
-
-    const msPerDay = 1000 * 60 * 60 * 24;
-    const daysInactive = lastSet
-      ? (Date.now() - lastSet.date.getTime()) / msPerDay
-      : 14;
-
-    const plateauWeeks = this.getPlatoeWeeks(nextMaschine);
 
     //das kann passieren wenn es nur aufwärmrecords gibt
     if (!lastSet) {
@@ -134,19 +123,14 @@ export default class Workouts {
         ok: 1,
         start_time: new Date(),
         ended: false,
-        weight: weight,
-        reps: reps,
+        weight: !p.is_new_maschine
+          ? floorWeight(weight / WARMUP_PROCENT, nextMaschine.steps)
+          : -1,
+        reps: !p.is_new_maschine ? reps : -1,
       };
     }
 
-    const data = nextWeight(
-      nextMaschine,
-      lastSet,
-      lastThreeSets,
-      daysInactive,
-      plateauWeeks,
-      p.set === 1,
-    );
+    const data = this.calculateNextWeight(p);
 
     if (!this.retrain) {
       this.retrain = this.checkForRetraining();
@@ -212,18 +196,108 @@ export default class Workouts {
   private saveWorkout(start_time: Date) {
     const now = new Date();
     const id = this.conn.insertWorkout(start_time, now);
-    ///UNIMPLEMENTED("this.conn.addWorkout(...)");
 
     return id;
+  }
+
+  private setPause(p: Player) {
+    p.state = PlayerState.PAUSE;
+    p.lastPause = new Date();
+  }
+
+  public skipSet(user_id: number) {
+    const p = this.getPlayerById(user_id)!;
+
+    p.set++;
+
+    if (p.set > 3) {
+      return this.skipMaschine(user_id);
+    }
+
+    this.setPause(p);
+
+    const currentMaschine = p.maschines[p.maschine_index].maschine;
+    const lastSet = this.conn.getLastRecords(currentMaschine.id, 1)[0];
+
+    if (!lastSet) {
+      return {
+        ok: 1,
+        weight: -1,
+        reps: -1,
+      };
+    }
+
+    const w = this.calculateNextWeight(p);
+
+    return {
+      ok: 1,
+      ...w,
+    };
+  }
+
+  public skipMaschine(user_id: number) {
+    const p = this.getPlayerById(user_id)!;
+
+    this.getNextMaschine(user_id);
+
+    p.state = 1;
+    p.is_new_maschine = true;
+    p.maschine_index++;
+
+    const currentMaschine = p.maschines[p.maschine_index].maschine;
+    const lastSet = this.conn.getLastRecords(currentMaschine.id, 1)[0];
+
+    this.setPause(p);
+
+    if (!lastSet) {
+      return {
+        ok: 1,
+        weight: -1,
+        reps: -1,
+      };
+    }
+
+    const w = this.calculateNextWeight(p);
+
+    return {
+      ok: 1,
+      ...w,
+    };
   }
 
   private endWorkout(p: Player) {
     this.conn.endWorkout(new Date(), p.workout_id);
   }
 
+  private calculateNextWeight(p: Player): { weight: number; reps: number } {
+    const nextRecommendation = p.maschines[p.maschine_index];
+    const nextMaschine = nextRecommendation.maschine;
+
+    const lastSet = this.conn.getLastRecords(nextMaschine.id, 1)[0];
+    const lastThreeSets = this.conn.getLastRecords(nextMaschine.id, 3);
+
+    const msPerDay = 1000 * 60 * 60 * 24;
+    const daysInactive = lastSet
+      ? (Date.now() - lastSet.date.getTime()) / msPerDay
+      : 14;
+
+    const plateauWeeks = this.getPlatoeWeeks(nextMaschine);
+
+    const w = nextWeight(
+      nextMaschine,
+      lastSet,
+      lastThreeSets,
+      daysInactive,
+      plateauWeeks,
+      p.set == 1,
+    );
+
+    return w;
+  }
+
   start(user_id: number, rounds: number) {
     const has_workout = this.hasWorkout(user_id);
-    if (has_workout) return 0;
+    if (has_workout) return { ok: 0, weights: -1, reps: -1 };
 
     const workout_id = this.saveWorkout(new Date());
 
@@ -244,8 +318,20 @@ export default class Workouts {
 
     this.getNextMaschine(user_id);
 
-    //UNIMPLEMENTED("Workout.start(...)");
+    const lastSet = this.conn.getLastRecords(
+      newPlayer.maschines[0].maschine.id,
+      1,
+    )[0];
 
-    return 1;
+    console.log(lastSet);
+
+    //damit Wissen wir, dass die Maschine noch nie benutzt wurde
+    if (!lastSet) {
+      return { ok: 1, weights: -1, reps: -1 };
+    }
+
+    const w = this.calculateNextWeight(newPlayer);
+
+    return { ok: 1, ...w };
   }
 }
